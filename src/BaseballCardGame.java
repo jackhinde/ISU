@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
+import javax.swing.JOptionPane;
 
 public class BaseballCardGame extends javax.swing.JFrame {
 
@@ -11,7 +12,9 @@ public class BaseballCardGame extends javax.swing.JFrame {
     ListIterator it;
     int money = 15;
     int numcards = 0;
+    int cur;
     BaseballCard bc;
+    int r;
     
     public BaseballCardGame() {
         initComponents();
@@ -42,6 +45,7 @@ public class BaseballCardGame extends javax.swing.JFrame {
         it = list.listIterator();
         lblmoney.setText("" + money);
         lblnumcards.setText("" + numcards);
+        cur = 0;
         //test
         add(6);
         show(bc);
@@ -57,10 +61,20 @@ public class BaseballCardGame extends javax.swing.JFrame {
         lblcardnum.setText("" + c.getCardNumber());
         lblimage.setIcon(c.getImage());
         //still must do pitcher and batter stats
+        /*if(c instanceof BatterCard){
+            lblaverage.setText("" + c.getAverage());
             
+        }
+        if(c instanceof PitcherCard){
+            
+        }
+        */
     }
     
     public void add(int r){
+        if(numcards==0){
+            cur++;
+        }
         //get with key and assign to BaseballCard bc
         bc = m.get(r);
         //advance to end of list to add new card
@@ -68,6 +82,7 @@ public class BaseballCardGame extends javax.swing.JFrame {
             it.next();
         }
         it.add(bc);
+        numcards++;
     }
 
     @SuppressWarnings("unchecked")
@@ -270,10 +285,10 @@ public class BaseballCardGame extends javax.swing.JFrame {
                     .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblteam, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel6)
-                        .addComponent(jLabel3)
-                        .addComponent(lblteam, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel3))
                     .addComponent(lblcardnum, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblimage, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -339,6 +354,11 @@ public class BaseballCardGame extends javax.swing.JFrame {
         lblmoney.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         btnbuy.setText("Buy pack for $15");
+        btnbuy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnbuyActionPerformed(evt);
+            }
+        });
 
         btnsell.setText("Sell Card");
         btnsell.addActionListener(new java.awt.event.ActionListener() {
@@ -451,23 +471,113 @@ public class BaseballCardGame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnexitActionPerformed
 
     private void btnnextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnnextActionPerformed
-        if(it.hasNext()){
-            
-        }
+        if(cur==numcards) return;
+        cur++;
+        it.next();
+        it.next();
+        bc = (BaseballCard) it.previous();
+        show(bc);
     }//GEN-LAST:event_btnnextActionPerformed
 
     private void btnpreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnpreviousActionPerformed
-        if(it.hasPrevious()){
-            
-        }
+        if(cur==1) return;
+        cur--;
+        bc = (BaseballCard) it.previous();
+        show(bc);
     }//GEN-LAST:event_btnpreviousActionPerformed
 
     private void btnsellActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnsellActionPerformed
+        //ensure that there are cards
         if(numcards==0) return;
-        it.next();
+        //collect baseball card
+        bc = (BaseballCard)it.next();
+        //add value of sold card to money
+        money += bc.getValue();
+        //remove card
         it.remove();
-        
+        //update money
+        lblmoney.setText("" + money);
+        //update number of cards
+        numcards--;
+        lblnumcards.setText("" + numcards);
+        //exit if selling the last card
+        if(numcards == 0){
+            lblname.setText("");
+            lblposition.setText("");
+            lblteam.setText("");
+            lblvalue.setText("");
+            lblcardnum.setText("");
+            lblimage.setIcon(null);
+            //still must do pitcher and batter stats
+            /*if(c instanceof BatterCard){
+                lblaverage.setText("" + c.getAverage());
+            
+            }
+            if(c instanceof PitcherCard){
+            
+            }
+            */
+            return;
+        }
+        //check to see if at front of card list
+        else if(cur > 1){
+            bc = (BaseballCard)it.previous();
+            cur--;
+        }
+        else{
+            it.next();
+            bc = (BaseballCard)it.previous();
+        }
+        show(bc);
     }//GEN-LAST:event_btnsellActionPerformed
+
+    private void btnbuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnbuyActionPerformed
+        BaseballCard bca, bcb, bcc, bcd, bce;
+        money -=15;
+        lblmoney.setText("$" + money);
+        numcards+=5;
+        lblnumcards.setText("" + numcards);
+        r = (int)Math.random()*20 + 1;
+        while(it.hasNext()){
+            it.next();
+        }
+        add(r);
+        it.next();
+        bca = (BaseballCard)it.previous();
+        //repeat for second card
+        r = (int)Math.random()*20 + 1;
+        while(it.hasNext()){
+            it.next();
+        }
+        add(r);
+        it.next();
+        bcb = (BaseballCard)it.previous();
+        //repeat for third card
+        r = (int)Math.random()*20 + 1;
+        while(it.hasNext()){
+            it.next();
+        }
+        add(r);
+        it.next();
+        bcc = (BaseballCard)it.previous();
+        //repeat for fourth card
+        r = (int)Math.random()*20 + 1;
+        while(it.hasNext()){
+            it.next();
+        }
+        add(r);
+        it.next();
+        bcd = (BaseballCard)it.previous();
+        //repeat for fifth card
+        r = (int)Math.random()*20 + 1;
+        while(it.hasNext()){
+            it.next();
+        }
+        add(r);
+        it.next();
+        bce = (BaseballCard)it.previous();
+        //show the new cards
+    }//GEN-LAST:event_btnbuyActionPerformed
 
     public static void main(String args[]) {
 
